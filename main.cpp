@@ -7,8 +7,8 @@ using namespace std;
 int main(int argc, char * argv[]){
 
     clock_t startt = clock();
-    inputGraph(argv[0], 16);
-    freopen("D:\\Learning\\.vscode\\ttth\\out.txt", "w", stdout);
+    inputGraph(argv[0], 5);
+    freopen("out.txt", "w", stdout);
     // changeToNewGraph()
 
     markObstacle();

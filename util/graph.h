@@ -11,7 +11,7 @@ int mapHeight, mapWidth, numObstacle;
 int graphStatus[1000][1000] = {};
 
 void inputGraph(string fp, int numInput){
-    fp = "D:\\Learning\\.vscode\\ttth\\input\\map" + to_string(numInput) + ".txt";
+    fp = "input\\map" + to_string(numInput) + ".txt";
 	freopen(&fp[0], "r", stdin);
 
     start = new point();
