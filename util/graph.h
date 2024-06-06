@@ -6,7 +6,7 @@ struct point{
     point(double x1, double y1, point *next1) : x(x1), y(y1), next(next1) {}
 };
 int nearPoint[8][2] = {{1, 0}, {0, 1}, {1, 1}, {-1, 1}, {1, -1}, {0, -1}, {-1, 0}, {-1, -1}};
-point *start, *finish, *obstacle[1000], *initStart, *initFinish;
+point *start, *finish, *obstacles[1000], *initStart, *initFinish;
 int mapHeight, mapWidth, numObstacle;
 int graphStatus[1000][1000] = {};
 
@@ -37,13 +37,13 @@ void inputGraph(string fp, int numInput){
             ss >> y1;
             x1 *= 2;
             y1 *= 2;
-            obstacle[i] = new point(x1, y1, obstacle[i]);
+            obstacles[i] = new point(x1, y1, obstacles[i]);
         }
     }
-    obstacle[numObstacle] = new point(-0, -0, obstacle[numObstacle]);
-    obstacle[numObstacle] = new point(mapWidth-0, -0, obstacle[numObstacle]);
-    obstacle[numObstacle] = new point(mapWidth-0, mapHeight-0, obstacle[numObstacle]);
-    obstacle[numObstacle] = new point(-0, mapHeight-0, obstacle[numObstacle]);
+    obstacles[numObstacle] = new point(-0, -0, obstacles[numObstacle]);
+    obstacles[numObstacle] = new point(mapWidth-0, -0, obstacles[numObstacle]);
+    obstacles[numObstacle] = new point(mapWidth-0, mapHeight-0, obstacles[numObstacle]);
+    obstacles[numObstacle] = new point(-0, mapHeight-0, obstacles[numObstacle]);
     ++numObstacle;
 }
 
@@ -62,7 +62,7 @@ void changeToNewGraph(){
     double a = finish->x-start->x, b = finish->y-start->y;
     double cos = a/sqrt(a*a+b*b), sin = b/sqrt(a*a+b*b);
     for(int i = 0; i < numObstacle; i++){
-        point *p = obstacle[i];
+        point *p = obstacles[i];
         while(p) {
             double x1 = cos * (p->x - start->x) + sin * (p->y - start->y);
             double y1 = cos * (p->y - start->y) - sin * (p->x - start->x);
@@ -83,7 +83,7 @@ void changeToInitGraph(){
     double a = finish->x-start->x, b = finish->y-start->y;
     double cos = a/sqrt(a*a+b*b), sin = b/sqrt(a*a+b*b);
     for(int i = 0; i < numObstacle; i++){
-        point *p = obstacle[i];
+        point *p = obstacles[i];
         while(p) {
             p->x -= 150;
             p->y -= 150;
@@ -103,10 +103,6 @@ bool onMapSize(int i, int j){
 
 void markPointNotCome(double x, double y){
     int x1 = max(1, (int) x), y1 = max(1, (int) y);
-    // x = max(1.0, x);
-    // y = max(1.0, y);
-    // if(x1 < 0 || y1 < 0) return;
-    // if(x < 0.5 || y < 0.5) return;
     graphStatus[x1][y1] = 1000000;
     graphStatus[x1-1][y1] = 1000000;
     graphStatus[x1][y1-1] = 1000000;
@@ -116,16 +112,8 @@ void markPointNotCome(double x, double y){
     graphStatus[x1+1][y1] = 1000000;
     graphStatus[x1][y1+1] = 1000000;
     graphStatus[x1+1][y1+1] = 1000000;
-    // graphStatus[(int)x][(int)y] = 1000000;
-    // graphStatus[(int)(x-0.5)][(int)y] = 1000000;
-    // graphStatus[(int)x][(int)(y-0.5)] = 1000000;
-    // graphStatus[(int)(x-0.5)][(int)(y-0.5)] = 1000000;
-    // graphStatus[(int)(x+0.5)][(int)(y-0.5)] = 1000000;
-    // graphStatus[(int)(x-0.5)][(int)(y+0.5)] = 1000000;
-    // graphStatus[(int)(x+0.5)][(int)y] = 1000000;
-    // graphStatus[(int)x][(int)(y+0.5)] = 1000000;
-    // graphStatus[(int)(x+0.5)][(int)(y+0.5)] = 1000000;
 }
+
 void markPointNotCome2(double x, double y){
     int x1 = max(1, (int) x), y1 = max(1, (int) y);
     graphStatus[x1-2][y1] = 1000000;
@@ -208,7 +196,7 @@ void markObstacle(){
     reSizeX = 1000 / mapWidth;
     reSizeY = 1000 / mapHeight;
     for(int i = 0; i < numObstacle; ++i){
-        point *p = obstacle[i], *q = p->next;
+        point *p = obstacles[i], *q = p->next;
         while(q != nullptr){
             // if(q->next != nullptr && vectorThreePoint(p, q, q->next) == false){
             //     markPointNotCome2(q->x, q->y);
@@ -217,7 +205,7 @@ void markObstacle(){
             p = q;
             q = q->next;
         }
-        q = obstacle[i];
+        q = obstacles[i];
         markLineNotCome(p, q);
     }
     // for(int i = 0; i < 300; i++){

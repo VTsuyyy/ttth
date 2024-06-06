@@ -271,7 +271,7 @@ void saveExe(){
     }
     // if(numPopu > 5)
     numPopulations = numPopu;
-    cout << "Number of " << numPopulations << endl;
+    // cout << "Number of " << numPopulations << endl;
 }
 
 void PSOES(double toiu, int loop){
