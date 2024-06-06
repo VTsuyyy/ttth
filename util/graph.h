@@ -11,9 +11,11 @@ int mapHeight, mapWidth, numObstacle;
 int graphStatus[1000][1000] = {};
 
 void inputGraph(string fp, int numInput){
-    fp = "input\\map" + to_string(numInput) + ".txt";
-	freopen(&fp[0], "r", stdin);
-
+    string fp1 = "input\\map" + to_string(numInput) + ".txt";
+	freopen(&fp1[0], "r", stdin);
+    string fp2 = "output\\out" + to_string(numInput) + ".txt";
+    cout << fp << endl << fp1 << endl << fp2 << endl;
+    freopen(&fp2[0], "w", stdout);
     start = new point();
     finish = new point();
     cin >> mapHeight >> mapWidth;

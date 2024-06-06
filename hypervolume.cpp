@@ -65,13 +65,14 @@ void pathFunc(path *path1) {
         z = sqrt(x*x + y*y);
         distance += z;
         double tmp = 100.0/pow(distanceToObstacle(p, p1), 2);
-        cout << tmp << " ";
+        // cout << tmp << " ";
         safety += tmp;
         currAngle = 100 * acos(x/z) * (y >= 0 ? 1 : -1);
         if(i++ != 0) angle += abs(currAngle - pastAngle);
         pastAngle = currAngle;
         p = p1;
-    }cout << endl;
+    }
+    // cout << endl;
     path1->safety = safety/i;
     path1->distance = distance;
     path1->angle = max(1.0, angle) / sqrt(i);
@@ -79,8 +80,14 @@ void pathFunc(path *path1) {
 
 bool checkValidPath(path *p){
     point *p1 = p->begin;
-    if(abs(p1->x - start->x) > 0.1 || abs(p1->y - start->y) > 0.1) return false;
-    while(p1->next != nullptr){
+    if(abs(p1->x - start->x) > 0.1 || abs(p1->y - start->y) > 0.1) {
+        p1 = new point(start->x, start->y, p1);
+    }
+    while(true){
+        if(p1->next == nullptr){
+            if(abs(p1->x - finish->x) < 0.1 && abs(p1->y - finish->y) < 0.1) break;
+            p1->next = new point(finish->x, finish->y, nullptr);
+        }
         for(int i = 0; i < numObstacle; ++i){
             point *obstacle = obstacles[i];
             while(obstacle->next != nullptr){
@@ -95,23 +102,31 @@ bool checkValidPath(path *p){
         }
         p1 = p1->next;
     }
-    if(abs(p1->x - finish->x) > 0.1 || abs(p1->y - finish->y) > 0.1) return false;
+    pathFunc(p);
+    if(p->safety > 300) return false;
     return true;
 } 
 
 int main(){
-    freopen("input\\map6.txt", "r", stdin);
+    // freopen("input\\map6.txt", "r", stdin);
+    // const string s = 
+    int numIO = 4;
+    ifstream file1("HaiNSGAII\\nsgaii_test"+to_string(numIO)+".txt");
+    // ifstream file1("HaiPSOES\\psoes_test"+to_string(numIO)+".txt");
+    // ifstream file1("HaiPSO\\pso_test"+to_string(numIO)+".txt");
+    // ifstream file1("output\\out"+to_string(numIO)+".txt");
+    ifstream file2("input\\map"+to_string(numIO)+".txt");
     // freopen("out.txt", "r", stdin);
     start = new point();
     finish = new point();
-    cin >> mapHeight >> mapWidth;
-    cin >> start->x >> start->y >> finish->x >> finish->y;
-    cin >> numObstacle;
+    file2 >> mapHeight >> mapWidth;
+    file2 >> start->x >> start->y >> finish->x >> finish->y;
+    file2 >> numObstacle;
 
     string s;
     for(int i = 0; i < numObstacle; ++i){
-        cin.ignore();
-        getline(cin, s);
+        file2.ignore();
+        getline(file2, s);
         stringstream ss(s);
         double x1, y1;
         while(ss >> x1){
@@ -128,17 +143,13 @@ int main(){
         }
         // cout << "-----" << endl;
     }
-    freopen("CON", "r", stdin);
-    if (freopen("D:\\Learning\\.vscode\\ttth\\out.txt", "r", stdin) == NULL) {
-        std::cerr << "Error opening file2.txt" << std::endl;
-        return 1;
-    }
-    // freopen("out.txt", "r", stdin);
+    
+    file2.close();
     double x=1, y;
-    cin >> x;
-    int loop = 100;
+    file1 >> x;
+    int loop = 1000;
     while(loop-- > 0){
-        cout << x;
+        // cout << x;
         if(abs(x+2.0) < 0.01 || abs(x+1.0) < 0.01){
             path *tmp = new path();
             point *p = population[numPath], *q = p->next, *l = q->next;
@@ -153,26 +164,32 @@ int main(){
             population[numPath] = q;
             tmp->begin = population[numPath];
             if(checkValidPath(tmp)) {
-                pathFunc(tmp);
+                // pathFunc(tmp);
                 paths[numPath] = tmp;
                 ++numPath;
             }
             else population[numPath] = nullptr;
             if(abs(x+2.0) < 0.01) break;
-            cin >> x;
+            file1 >> x;
             continue;
         }
-        cin >> y;
+        file1 >> y;
         // cout << x << " " << y << endl;
         population[numPath] = new point(x, y, population[numPath]);
-        cin >> x;
+        file1 >> x;
     }
-    cout << numPath << endl;
+    file1.close();
+    // cout << numPath << endl;
+    sort(paths, paths+numPath, [](path *path1, path *path2)->bool{
+        return path1->distance < path2->distance;
+    });
+    map<int, int> ma;
+    ma[0] = 0;
+    ma[100] = 0;
+    cout << "map " << numIO << endl;
     for(int i = 0; i < numPath; ++i){
         cout << "path " << i << ": " << paths[i]->distance << " " << paths[i]->angle << " " << paths[i]->safety << endl;
     }
-    
-
 
     // point *tt = new point(44.831607137124756, 65.23612244242828, nullptr), *tt1 = new point(54.70618961196313, 60.37850241367214, nullptr);
     // point *o1 = new point(51, 62, nullptr), *o2 = new point(57, 55, nullptr);

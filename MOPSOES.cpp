@@ -7,8 +7,8 @@ using namespace std;
 int main(int argc, char * argv[]){
     srand(time(0));
     clock_t startt = clock();
-    inputGraph(argv[0], 6);
-    freopen("out.txt", "w", stdout);
+    inputGraph(argv[0], 15);
+    // freopen("output\\out2.txt", "w", stdout);
     // changeToNewGraph()
 
     markObstacle();
