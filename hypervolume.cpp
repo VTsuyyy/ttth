@@ -77,7 +77,7 @@ void pathFunc(path *path1) {
     path1->distance = distance;
     path1->angle = max(1.0, angle) / sqrt(i);
 }
-
+double limitHV = 300;
 bool checkValidPath(path *p){
     point *p1 = p->begin;
     if(abs(p1->x - start->x) > 0.1 || abs(p1->y - start->y) > 0.1) {
@@ -103,14 +103,14 @@ bool checkValidPath(path *p){
         p1 = p1->next;
     }
     pathFunc(p);
-    if(p->safety > 300) return false;
+    if(p->safety > limitHV || p->angle > limitHV) return false;
     return true;
 } 
 
 int main(){
     // freopen("input\\map6.txt", "r", stdin);
     // const string s = 
-    int numIO = 4;
+    int numIO = 15;
     ifstream file1("HaiNSGAII\\nsgaii_test"+to_string(numIO)+".txt");
     // ifstream file1("HaiPSOES\\psoes_test"+to_string(numIO)+".txt");
     // ifstream file1("HaiPSO\\pso_test"+to_string(numIO)+".txt");
@@ -183,17 +183,26 @@ int main(){
     sort(paths, paths+numPath, [](path *path1, path *path2)->bool{
         return path1->distance < path2->distance;
     });
-    map<int, int> ma;
-    ma[0] = 0;
-    ma[100] = 0;
+    map<double, double> ma;
+    ma[0] = limitHV;
+    ma[limitHV] = 0;
+    double past = 0, hyperVolume = 0, sq = 0;
     cout << "map " << numIO << endl;
     for(int i = 0; i < numPath; ++i){
+        ma[paths[i]->angle] = paths[i]->safety;
         cout << "path " << i << ": " << paths[i]->distance << " " << paths[i]->angle << " " << paths[i]->safety << endl;
+        hyperVolume += sq * (paths[i]->distance - past);
+        double tmp = 0, tmp1 = limitHV;
+        sq = 0;
+        for(auto &j : ma){
+            if(j.second > tmp1) continue;
+            sq += (limitHV-tmp1)*(j.first-tmp);
+            tmp = j.first;
+            tmp1 = j.second;
+        }
+        past = paths[i]->distance;
     }
-
-    // point *tt = new point(44.831607137124756, 65.23612244242828, nullptr), *tt1 = new point(54.70618961196313, 60.37850241367214, nullptr);
-    // point *o1 = new point(51, 62, nullptr), *o2 = new point(57, 55, nullptr);
-    // // cout << endl << distanceToObstacle(tt, tt1);
-    // cout << distancePointToLine(tt, o1, o2) << endl;
-    // cout << distancePointToLine(tt1, o1, o2) << endl;
+    hyperVolume += sq * (limitHV-past);
+    int hv = (int) hyperVolume;
+    cout << endl << "Hyper volume: " << hv << endl;
 }
